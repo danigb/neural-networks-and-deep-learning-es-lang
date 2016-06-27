@@ -67,3 +67,31 @@ He descrito perceptrones como un método para la valoración de pruebas para tom
 ![Perceptron](images/tikz2.png)
 
 Entonces vemos que de entrada `[0, 0]` produce la salida `1`, ya que `(-2) * 0 + (- 2) * 0 + 3 = 3` es positivo. Aquí, he introducido el símbolo `*` para realizar las multiplicaciones explícita. Cálculos similares muestran que las entradas `[0, 1]`y `[1, 0]` producen siempre `1`. Sin embargo, la entrada `[1, 1]` produce la salida `0`, ya que `(-2) * 1 + (- 2) * 1 + 3 = -1` es negativo. Así nuestro perceptrón implementa una [puerta NAND](https://es.wikipedia.org/wiki/Puerta_NAND)!
+
+El ejemplo NAND demuestra que se pueden utilizar perceptrones para calcular funciones lógicas simples. De hecho, podemos utilizar redes de perceptrones para calcular cualquier función lógica. La razón es que la puerta NAND es universal para el cálculo computacional, es decir, podemos construir cualquier cálculo a base de puertas NAND. Por ejemplo, podemos utilizar compuertas NAND para construir un circuito que suma dos bits, `x1` y `x2`. Esto requiere el cálculo de la suma bit a bit, `x1⊕x2`, así como un bit de acarreo que se establece en `1` cuando ambos `x1` y `x2` son `1`, es decir, el bit de acarreo es el producto `x1x2` bit a bit:
+
+![Suma de dos bits utilizando puertas lógicas](images/tikz3.png)
+
+Para tener una red equivalente de perceptrones reemplazamos todas las puertas NAND por perceptrones con dos entradas, cada una con un peso `[-2, -2]`, y un sesgo general de `3`. Aquí está la red resultante. Ten en cuenta que me he movido el perceptrón correspondiente a la puerta NAND de la parte inferior derecha un poco simplemente para simplificar las flechas en el diagrama:
+
+![Suma de dos bits utilizando perceptrones](images/tikz4.png)
+
+Un aspecto importante de esta red de perceptrones es que la salida del  perceptron más a la izquierda se utiliza dos veces como entrada para el perceptrón inferior. Cuando he definido el modelo de perceptrón no he dicho si se le permitía este tipo de salida-doble-al-mismo-lugar. En realidad, no importa mucho. Si no queremos permitir que este tipo de cosas, entonces es posible simplemente fusionar las dos líneas, en una sola conexión con un peso de -4 en lugar de dos conexiones con pesos de -2 (si no encuentras esto obvio, debes parar hasta probar que es equivalente) Con este cambio, la red se ve de la siguiente forma, con todos los pesos sin marcar igual a -2, todos los sesgos igual a 3, y una solo peso de -4, como está indicado:
+
+![Suma de dos bits utilizando perceptrones simplificado](images/tikz5.png)
+
+Up to now I've been drawing inputs like x1x1 and x2x2 as variables floating to the left of the network of perceptrons. In fact, it's conventional to draw an extra layer of perceptrons - the input layer - to encode the inputs:
+
+![La capa de entrada](images/tikz6.png)
+
+Esta notación para los perceptrones de entrada, en los que tenemos una salida, pero no hay entradas,
+
+![Perceptrón de la capa de entrada](images/tikz7.png)
+
+es una abreviatura. En realidad, no significa un perceptrón sin entradas. Para entenderlo, supongamos que tenemos un perceptrón sin entradas. A continuación, la suma ponderada siempre sería cero, y por lo tanto el perceptrón sacaría siempre `1` si el sesgo es mayor que 0, o `0` si el sesgo es menor o igual que 0. Es decir, el perceptrón simplemente sacaría un valor fijo y no el valor deseado (`x1`, en el ejemplo anterior). Es mejor pensar que los perceptrones de entrada no son perceptrones en absoluto, sino más bien unidades especiales que simplemente se definen como que sacan a los valores deseados `x1, x2, ...`
+
+El ejemplo del sumador demuestra cómo una red de perceptrones se puede utilizar para simular un circuito que contiene muchas puertas NAND. Y debido a puertas NAND son universales para el cálculo computacional, se deduce que los perceptrones también son universales para el mismo cálculo.
+
+La universalidad computacional de los perceptrones es a la vez tranquilizador y decepcionante. Es tranquilizador porque nos dice que las redes de perceptrones pueden ser tan poderosas como cualquier otro dispositivo informático. Pero también es decepcionante, ya que hace que parezca como si perceptrones no son más que un nuevo tipo de puerta NAND. ¡Y eso no es una gran noticia!
+
+However, the situation is better than this view suggests. It turns out that we can devise learning algorithms which can automatically tune the weights and biases of a network of artificial neurons. This tuning happens in response to external stimuli, without direct intervention by a programmer. These learning algorithms enable us to use artificial neurons in a way which is radically different to conventional logic gates. Instead of explicitly laying out a circuit of NAND and other gates, our neural networks can simply learn to solve problems, sometimes problems where it would be extremely difficult to directly design a conventional circuit.

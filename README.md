@@ -13,3 +13,11 @@ This is a translation to spanish of: http://neuralnetworksanddeeplearning.com/
 4. Una demostración visual de que las redes neuronales pueden calcular cualquier función.
 5. ¿Por qué las redes neuronales profundas son tan difíciles de entrenar?
 6. Aprendizaje profundo
+
+## License
+
+This is a translation of: Michael A. Nielsen, "Neural Networks and Deep Learning", Determination Press, 2015
+
+That work is licensed under a Creative Commons Attribution-NonCommercial 3.0 Unported License. This means you're free to copy, share, and build on this book, but not to sell it.
+
+This translation has the same license.

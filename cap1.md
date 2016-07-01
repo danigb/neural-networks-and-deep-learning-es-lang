@@ -172,3 +172,57 @@ Sin embargo, hay otros modelos de redes neuronales artificiales en las que son p
 Las redes neuronales recurrentes han tenido menos peso que las redes de alimentación hacia adelante, en parte debido a que los algoritmos de aprendizaje para redes recurrentes son (al menos hasta la fecha) menos potentes. Pero las redes recurrentes siguen siendo extremadamente interesantes. Están mucho más cerca en espíritu a cómo funciona nuestro cerebro que las redes de alimentación hacia adelante. Y es posible que redes recurrentes pueden resolver los problemas importantes que sólo pueden ser resueltos con gran dificultad las redes de alimentación hacia adelante. Sin embargo, para limitar nuestro campo de acción, en este libro vamos a concentrarnos en las redes de alimentación hacia adelante, que son más ampliamente utilizadas.
 
 ## Una red simple para clasificar números escritos a mano
+
+Habiendo definido las redes neuronales, volvamos al reconocimiento de escritura. Podemos dividir el problema del reconocimiento de dígitos escritos a mano en dos sub-problemas. En primer lugar, tenemos que dividir una imagen con varios dígitos en una secuencia de imágenes independientes, cada uno con un solo dígito. Por ejemplo, nos gustaría dividir la imagen
+
+![Varios dígitos](images/digits.png)
+
+en seis imágenes separadas,
+
+![Dígitos separados](images/digits_separate.png)
+
+We humans solve this segmentation problem with ease, but it's challenging for a computer program to correctly break up the image. Once the image has been segmented, the program then needs to classify each individual digit. So, for instance, we'd like our program to recognize that the first digit above,
+
+![Un 5 de mnist](images/mnist_first_digit.png)
+
+es un 5.
+
+Nos centraremos en escribir un programa que resuelva el segundo problema, es decir, la clasificación de los dígitos individuales. Hacemos esto porque resulta que el problema de la segmentación no es tan difícil de resolver una vez que tenga una buena forma de clasificar los dígitos individuales. Hay muchos enfoques para resolver el problema de la segmentación. Un método consiste probar muchas maneras diferentes de segmentar la imagen, utilizando el clasificador individual de dígitos para puntuar cada segmentación. Una segmentación concreta obtiene una puntuación alta si el clasificador de dígitos consigue distinguir cada uno de los segmentos, y una puntuación baja si el clasificador tiene problemas en uno o más segmentos. La idea es que si el clasificador tiene problemas en algún lugar, entonces es probable que esos problemas sean debidos a que la segmentación ha sido incorrecta. Esta idea y otras variaciones se pueden utilizar para resolver el problema de la segmentación bastante bien. Así que en lugar de preocuparse por la segmentación nos concentraremos en el desarrollo de una red neuronal que pueda resolver el problema más interesante y difícil, es decir, el reconocimiento de dígitos escritos a mano individuales.
+
+Para reconocer dígitos individuales vamos a utilizar una red neuronal de tres capas:
+
+![Red neuronal de tres capas](images/tikz12.png)
+
+La capa de entrada de la red contiene neuronas que codifican los valores de los píxeles de entrada. Como se analiza en la siguiente sección, nuestros datos de entrenamiento para la red consistirán en muchas imágenes de 28x28 píxeles con dígitos escritos a mano escaneados, por lo que la capa de entrada contiene 784 = 28 × 28 neuronas. Por simplicidad he omitido la mayor parte de las 784 neuronas de entrada en el diagrama anterior. Los píxeles de entrada son en escala de grises, con un valor de 0.0 para el blanco, un valor de 1.0 para negro, y tonos de gris de más claro a más oscuro para los valores entre ellos.
+
+La segunda capa de la red es una capa oculta. Designaremos el número de neuronas en esta capa oculta por `n`, y vamos a experimentar con diferentes valores. El ejemplo ilustra una pequeña capa oculta, que contiene solo `n = 15` neuronas.
+
+La capa de salida de la red contiene 10 neuronas. Si la primera neurona se activa, es decir, tiene una salida ≈1, indicará que la red cree que el dígito es un 0. Si la segunda neurona se activa indicará que la red cree que el dígito es un 1. Y así sucesivamente. Más concretamente, numeraremos las neuronas de salida de 0 a 9, y miraremos qué neurona tiene el valor más alto de activación. Si esa neurona es, por ejemplo, la número 6, significa que nuestra red cree que el dígito de entrada fue un 6. Y así sucesivamente para cada una de las neuronas de salida.
+
+Quizá te preguntes por qué usamos 10 neuronas de salida. Después de todo, el objetivo de la red es que nos diga qué dígito (0,1,2, ..., 9) se corresponde con la imagen de entrada. Una forma aparentemente natural de hacerlo es utilizar sólo 4 neuronas de salida, tratando cada neurona como un dígito de un número binario, dependiendo de si la salida de la neurona está más cerca de 0 o 1. Cuatro neuronas son suficientes para codificar la respuesta, ya que `2^4 = 16` es mayor que los 10 valores posibles para el dígito de entrada. ¿Por qué debería utilizar nuestra red de 10 neuronas en su lugar? ¿No es ineficiente? La justificación última es empírica: podemos probar ambos diseños de red, y resulta que, para este problema en particular, la red con 10 neuronas de salida aprende a reconocer los dígitos mejor que la red con 4 neuronas de salida. Pero eso nos deja la pregunta de por qué el uso de 10 neuronas de salida funciona mejor. ¿Hay alguna heurística que nos diga de antemano que debemos utilizar la una salida de 10 neuronas en lugar de 4?
+
+Para entender por qué hacemos esto, ayuda entender qué está haciendo la red neuronal, partiendo de lo más básico. Consideremos primero el caso en el que usamos 1010 neuronas de salida. Vamos a concentrarnos en la primera neurona de salida, la que está tratando de decidir si el dígito es o no un 00. Esto se hace ponderando la salida de la capa oculta de neuronas. ¿Qué están haciendo esas neuronas ocultas? Bueno, pongamos por caso que la primera neurona en la capa oculta detecta si una imágen como la siguiente está presente:
+
+![](images/mnist_top_left_feature.png)
+
+Se puede hacer esto dando mucha importancia a los píxeles de entrada que se superponen con la imagen, y valorando sólo un poco las otras entradas. De manera similar, pongamos por caso que la segunda, tercera, y la cuarta neurona de la capa oculta detectan si las imágenes siguientes están presentes o no:
+
+![](images/mnist_other_features.png)
+
+Como habrás supuesto, estas cuatro imágenes juntas conforman la imagen 0 que vimos en la línea de dígitos que hemos visto anteriormente:
+
+![](images/mnist_complete_zero.png)
+
+Así que si estas cuatro neuronas ocultas están activadas, se puede concluir que el dígito es un 0. Por supuesto, esa no es la única entrada posible que podemos utilizar para determinar que la imagen es un 0 -podríamos obtener un 0 de muchas otras formas (por ejemplo, a través de los desplazamientos o de ligeras distorsiones en las imágenes de arriba). Sin embargo, parece seguro decir que al menos en este caso podemos concluir que la entrada es un 00.
+
+Supposing the neural network functions in this way, we can give a plausible explanation for why it's better to have 1010 outputs from the network, rather than 44. If we had 44 outputs, then the first output neuron would be trying to decide what the most significant bit of the digit was. And there's no easy way to relate that most significant bit to simple shapes like those shown above. It's hard to imagine that there's any good historical reason the component shapes of the digit will be closely related to (say) the most significant bit in the output.
+
+Ahora bien, todo esto es sólo una heurística. Nada dice que la red neuronal de tres capas funcione de la manera que he descrito, con las neuronas que detectan formas ocultas de componentes simples. Tal vez un algoritmo de aprendizaje inteligente encontrará alguna asignación de los pesos que nos permitan usar sólo 4 neuronas de salida. Pero como heurística, la forma de pensar que he descrito funciona bastante bien, y se puede ahorrar mucho tiempo en el diseño de buenas arquitecturas de redes neuronales.
+
+### Ejercicio
+
+Hay una modo de determinar la representación binaria de un dígito, agregando una capa adicional a la red de tres capas. La capa adicional convierte la salida de la read anterior en una representación binaria, tal como se ilustra en la figura siguiente. Encontrar un conjunto de pesos y sesgos para la nueva capa de salida. Supón que las primeras 3 capas de neuronas son tales en la tercera capa (es decir, la antigüa capa de salida) tiene una activación de al menos de 0.99 en la respuesta correcta, y una activación de menos de 0.01 para las respuestas incorrectas.
+
+![Red neuronal de cuatro capas](images/tikz13.png)
+
+## Aprendiendo con el método de descenso por gradiente

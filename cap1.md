@@ -261,7 +261,7 @@ Una manera de atacar el problema es usando el cálculo para tratar de encontrar 
 
 Entonces, el cálculo no funciona. Afortunadamente hay una preciosa analogía que sugiere un algoritmo que funciona bastante bien. Empezamos por pensar nuestra función como una especie de valle. Si escudriñas un poco el gráfico de arriba no debería ser muy difícil. Imagina una pelota que cae rodando por la ladera del valle. Nuestra experiencia cotidiana nos dice que al final la pelota se parará en el fondo del valle. ¿Quizás podemos usar esa idea para encontrar el mínimo de una función? Elegimos una posición aleatoria como punto de inicio de una pelota (imaginaria) y simulamos el movimiento de la pelota a medida que rueda hacia el fondo. Podríamos hacer esa simulación simplemente calculando derivadas (y quizás algunas segundas derivadas) de `C` -esas derivadas nos dirían todo lo que necesitamos saber de la "forma local" del valle y por lo tanto, cómo rodaría nuestra pelota.
 
-Basándonos en lo que acabo de escribir, quizás estás pensando en que vamos a tratar de escribir las ecuaciones de Newton para el cáclulo del movimimiento, teniendo en cuenta los efectos de la fricción, gravedad, etcétera. En realidad, no vamos a tomarnos la analogía de la pelota de manera tan seria. Estamos tratando de encontrar un algormitmo para minimizar `C`, no desarrollar una simulación precisa de las leyes de la física! La imágen de la pelota sirve para estimular nuestra imaginación, no para encorsetar nuestro pensamiento. Así que en vez de meternos en todos los liosos detalles de la física, simplemente vamos a preguntarnos: si fuésemos Dios por un día y pudiésemos hacer nuestras propias leyes de la física, dictando cómo rueda la pelota, ¿qué leyes podríamos elegir que hiciesen que la peloya siempre rodase hacia el fondo del valle?
+Basándonos en lo que acabo de escribir, quizás estás pensando en que vamos a tratar de escribir las ecuaciones de Newton para el cálculo del movimiento, teniendo en cuenta los efectos de la fricción, gravedad, etcétera. En realidad, no vamos a tomarnos la analogía de la pelota tan en serio. Estamos tratando de encontrar un algoritmo para minimizar `C`, no desarrollar una simulación precisa de las leyes de la física! El símil de la pelota sirve para estimular nuestra imaginación, no para encorsetar nuestro pensamiento. Así que en vez de meternos en todos los liosos detalles de la física, simplemente vamos a preguntarnos: si fuésemos Dios por un día y pudiésemos hacer nuestras propias leyes de la física, dictando cómo rueda la pelota, ¿qué leyes podríamos elegir que hiciesen que la peloya siempre rodase hacia el fondo del valle?
 
 Para hacer esta pregunta más precisa, pensemos en que pasa cuando movemos la pelota un pequeño `Δv1` en dirección `v1`, y un pequeño desplazamiento `Δv2` en dirección `v2`. El cálculo nos dice que el cambio en `C` es:
 
@@ -271,7 +271,7 @@ Vamos a buscar una manera de elegir `Δv1` y `Δv2` de tal forma que `ΔC` sea n
 
 ![](images/math8.png)
 
-Dentro de poco vamos a re-escribir el cambio en `ΔC` en términos de `Δv` y de el gradiente `∇C`. Pero antes quiero despejar algunas dudas que a veces tiene la gente sobre el gradiente. Al encontrarnos con la notación `∇C` por primera vez, algunas personas se preguntan cómo deben pensar el símbolo `∇`. ¿Qué significa examentamente `∇`? De hecho, es perfectamente válido pensar en `∇C` como un objeto matemático -el vector definido más arriba- que se escribe utilizando dos símbolos. Desde este punto de vista, `∇` es simplemente un símbolo que nos dice "oye, `∇C` es un vector gradiente". Hay puntos de vista más avanzados que nos permiten ver `∇` como un objeto matemático independiente en su propio derecho (como por ejemplo el operador diferencial) pero no necesitamos esos puntos de vista.
+Dentro de poco vamos a re-escribir el cambio en `ΔC` en términos de `Δv` y de el gradiente `∇C`. Pero antes quiero despejar algunas dudas que a veces tiene la gente sobre el gradiente. Al encontrarnos con la notación `∇C` por primera vez, algunas personas se preguntan cómo deben pensar el símbolo `∇`. ¿Qué significa exactamente `∇`? De hecho, es perfectamente válido pensar en `∇C` como un objeto matemático -el vector definido más arriba- que se escribe utilizando dos símbolos. Desde este punto de vista, `∇` es simplemente un símbolo que nos dice "oye, `∇C` es un vector gradiente". Hay puntos de vista más avanzados que nos permiten ver `∇` como un objeto matemático independiente en su propio derecho (como por ejemplo el operador diferencial) pero no necesitamos esos puntos de vista.
 
 Con estas definiciones, la expresión (7) para `ΔC` puede ser reescrita como:
 
@@ -280,6 +280,87 @@ Con estas definiciones, la expresión (7) para `ΔC` puede ser reescrita como:
 
 Esta ecuación explicar por qué se llama a `∇C` el vector gradiente: `∇C` relaciona los cambios en `v` con los cambios en `C`, como esperaríamos de algo que se llama _gradiente_. Pero lo realmente importante sobre la ecuación es que nos deja ver cómo elegir `Δv` para que `ΔC` sea negativo. En concreto, supongamos que elegimos:
 
-![](images/math10.png)
+![Ecuación 10](images/math10.png)
 
-donde `η` es un número positivo pequeño (conocido como _tasa de aprendizaje_). La ecuación (9) nos dice que 
+donde `η` es un número positivo pequeño (conocido como _tasa de aprendizaje_). La ecuación (9) nos dice que `ΔC = -η||∇C||^2` y ya que `||∇C||^2` siempre será positivo, esto garantiza que `ΔC <= 0`, es decir, `C` siempre decrecerá si cambiamos `v` de acuerdo con la ecuación (10). Esa es exactamente la característica que necesitamos! Entonces usaremos la ecuación (10) para definir la "ley del movimiento" para la pelota en nuestro algormito de gradiente descendente. Esto es, usaremos la ecuación (10) para calcular el valor de `Δv` y moveremos la posición de la pelota `v` esa cantidad:
+
+![Ecuación 11](images/math11.png)
+
+Después usaremos esa misma ecuación para hacer otro movimiento. Si hacemos eso una y otra vez, estaremos haciendo `C` cada vez más pequeos hasta que (esperemos) lleguemos a un mínimo global.
+
+Resumiento, la manera en que funciona una algormitmo de gradiente descendente es calculando el gradiente `∇C` y después moviéndose en dirección _contraria_, desdenciendo por la ladera del valle. Lo podemos visualizar así:
+
+![Gráfico 4](images/graph4.png)
+
+Te en cuenta que esta regla del gradiente descendente no reproduce ningún movimiento físico real. En la vida real, la pelota tiene un impulso, y ese impulso permite que descienda por la cuesta e incluso (momentáneamente) que la suba. Sólo después de que los efectos del rozamiento actúen, la pelota se pararía en el fondo del valle. En cambio, nuestra regla para elegir `Δv` simplemente dice "ve hacia abajo ahora". ¡Y esa es una buena regla para encontrar el mínimo!
+
+Para hacer que el gradiente descendente funcione correctanente, tenemos que elegir una tasa de aprendizaje `η` lo sificientemente pequeña para que la ecuación (9) sea una buena aproximación. Si no, podríamos acabar con un `ΔC>0` lo que, obviamente, no estaría bien. Al mismo tiempo, no queremos que `η` sea demasiado pequeño, ya que haría el cambio en `v` diminuto, y el algoritmo sería demasiado lento. En la práctica, normalmente variamos `η` para que le ecuación (9) siga siendo una buena aproximación y el algormitmo no sea demasiado lento. Veremos próximamente cómo se consigue eso.
+
+He explicado el gradiente descendente cuando `C` es una función de sólo dos variables. Pero, en realidad, todo funciona igual de bien cuando `C` depende de varias variables. Por ejemplo, supongamos que `C` depende de `m` variables `v1, ...vm`. Entonces el cambio `ΔC` en `C` producido por un cambio pequeño `Δv=(Δv1,…,Δvm)T` es:
+
+![Ecuación 12](images/math12.png)
+(12) `ΔC≈∇C⋅Δv`
+
+donde el gradiente `∇C` es el vector:
+
+![Ecuación 13](images/math13.png)
+
+Al igual que cuando teníamos dos variables, elegimos:
+
+![Ecuación 14](images/math14.png)
+
+y así garantizamos que nuestra (aproximativa) ecuación (12) para `ΔC` sigue siendo negativa. Esto nos permite llevar el gradiente hacia el mínimo incluso cuando `C` es una función de varias variables, simplemente repitiendo la regla de la modificación de `v`
+
+![Ecuación 15](images/math15.png)
+
+Puedes pensar esta regla de modificación como la _definición_ del algoritmo de gradiente descendente. Nos da una manera de ir cambiando repetidamente la posición de `v` hasta encontrar el mínimo de la función `C`. Esta regla no siempre funciona -varias cosas pueden ir mal e impedir al gradiente descendente encontrar el mínimo global `C`, algo a lo que volveremos en capítulos posteriores. Pero en la práctica, el gradiente descendente normalmente funciona muy bien, y veremos que es una namera muy potende de minimizar la función de coste en las redes neuronales y por tanto ayudándolas a aprender.
+
+De hecho, hay un ***sense*** en el que el gradiente descendente es la estrategia óptima para encontrar un mínimo. Imaginemos que estamos tratando de mover `Δv` de tal forma que `C` se reduzca lo máximo posible. Eso es equivalente a minimizar `ΔC≈∇C⋅Δv`. Vamos a restringir el tamaño del cambio `∥Δv∥=ϵ` para un valor fijo `ϵ>0`. En otras palaras, queremos un desplazamiento que sea un pequeño paso de tamaño fijo, y vamos a intentar la dirección de movimiento que decrezca `C` lo máximo posible. Se puede probar que para minimizar `∇C⋅Δv` eligiendo `Δv=−η∇C` donde `η=ϵ/∥∇C∥` está determinado por la constante `∥Δv∥=ϵ`. Es decir, el gradiente descendente se puede ver como dar pequeños pasos en la dirección que más descienda `C`.
+
+### Ejercicios
+
+- Prueba la afirmación del últoimo párrafo. _Pista_: si no conoces la [desigualdad de Cauchy-Bunyakovsky-Schwarz](https://es.wikipedia.org/wiki/Desigualdad_de_Cauchy-Bunyakovsky-Schwarz), seguramente te será de ayuda familiarizarte con ella.
+- He explicado el gradiente descendente cuando `C` depende de dos variables y cuando depende de más de dos variables. Pero ¿qué pasa cuando `C` depende de una sola variable? ¿Puedes dar una interpretación geométrica de lo que hace el grandiente descendente en una sola dimensión?
+
+La gente ha investigado muchas variaciones del gradiente descendente, algunas que reproducen de manera más fiel una pelota en el mundo físico. Estas variaciones tienen algunas ventajas, pero también una gran desventaja: necesita que calculemos segundas derivadas parciales de `C`, lo que puede ser bastante costoso. Para entender por qué es costoso, supón que quieres calcular todas las segundas derivadas parciales de `∂2C/∂vj∂vk`. Si hay un millón de esas variables `vj` entonces necesitamos calcular como un trillón (un millón al cuadrado) de derivadas segundas. Eso tiene un coste computacional. Dicho esto, hay trucos para sortear este tipo de problemas y buscar alternativas al gradiente descendente es un área activa de investigación. Pero en este libro usaremos las grandientes decendientes (y sus variaciones) como manera fundamental de aprendizaje de las redes neuronales.
+
+Cómo podemos aplicar el gradiente descendente para aprender en las redes neuronales? La idea es usar el gradiente descendente para encontrar los pesos `wk` y los sesgos `bl` que minimicen el coste de la ecuación (6). Para ver cómo funciona, vamos a replantear la regla de gradiente descendente con los pesos y los sesgos reemplazando a las variables `vj`. Es decir, nuestra "posición" tiene ahora componentes `wk` y `bl` y el vector gradiente `∇C` tiene ahora componentes `∂C/∂wk` y `∂C/∂bl`. Escribiendo la regla de modificación del gradiente descendente en términos de esos componentes, obtenemos:
+
+![Ecuación 16](images/math16.png)
+
+![Ecuación 17](images/math17.png)
+
+Aplicando repetidamente estas reglas podemos "bajar rodando el valle" y, con suerte, encontrar un mínimo en la función de coste. En otras palabras, esta es la regla que podemos utilizar para que la red neuronal aprenda.
+
+Hay una serie de desafíos a la hora de aplicar la regla del gradiente descendente. Las estudiaremos en profuncidad en los siguientes capítulos, pero quiero mencionar ahora un problema. Para entender el problema, echemos un vistazo a la función quadrática de coste (6). Observa que esta función de coste tiene la forma `C=1n∑xCx`, es decir, es una media de costes `Cx≡∥y(x)−a∥^2/2` para cada una de las muestras de entrenamiento. En la práctica, para calcular el gradiente `∇C` necesitamos calcular los gradientes de `∇Cc` para cada muestra de entrenamiento `x` y después buscar la media de ellos: `∇C=1/n∑x∇Cx`. Desafortunadamente, cuando el número de muestras es muy grande, esto puede llevar bastante tiempo y por lo tanto el aprendizaje es lento.
+
+Hay una idea llamada _gradiente descendiente estocástico_ que puede ser utilizada para acelerar el aprendizaje. La idea es estimar el gradiente `∇C` calculando `∇Cx` para un número de muestras de entrnamiento pequeño tomadas aleatoriamente. Calculando la media de ese número de muestras resulta que podemos obtener rápidamente una estimación buena del gradiente `∇C` real, acelerante el cálculo del gradiente descendiente y por lo tanto el aprendizaje.
+
+Para decirlo de forma más precisa: el gradiente descendiente estocástico funciona tomando aleatoriamente un pequeño número de muestras de entrenamiento. Llamaremos a esas muestras de entrenamiento `X1,X2,…,Xm` y nos referiremos a ellas como _mini-lotes_. Siempre que el tamaño `m` de muestras sea lo suficientemente grande, obtendremos que la media del valor de `∇CXj` será aproximadamente igual a la media de todas las muestras `∇Cx`, es decir:
+
+![Ecuación 18](images/math18.png)
+
+donde la segunda suma es sobre todo el conjunto de datos de entrenamiento. Dándole la vuelta obtenemos
+
+![Ecuación 19](images/math19.png)
+
+confirmando que podemos estimar el gradiente total calculando sólo el gradiente para un número de muestras aleatorias pequeño.
+
+Para conectar esto de manera explícita con las redes neuronales, supón que `wk` y `bl` designan los pesos y los sesgos de nuestra red neuronal. Entonces el gradiente descendiente estocástico funciona entrenando la red a partir de un pequeño conjunto aleatorio de muestras de entrenamiento:
+
+![Ecuación 20](images/math20.png)
+![Ecuación 21](images/math21.png)
+
+donde los sumatorios se aplican a todas las muestras de entrada del actual `mini-lote`. Después elegimos aleatoriamente otro mini-lote y entrenamos con ellos. Y así sucesivanente, hasta que hayan finalizado las muestras de entrada, lo que se conoce como completar una _época_ de entrenamiento. En ese momento, empezamos de nuevo otra época de entrenamiento.
+
+Por cierto, merece la pena indicar que las convenciones sobre cómo escalar la función de coste y los cambios en pesos y sesos por el mini-lote varían. En la ecuación (6) escalamos la función de coste por un factor de `1/n`, aunque algunas personas simplemente omiten este factor y suman los costes de los entrenamientos en vez de las medias. Esto es útil cuando el número de muestras de entrenamiento no se conocen de antemano. Esto puede suceder cuando, por ejemplo, los datos de entrenamiento se generan en tiempo real. De igual manera, las reglas de actualización del mini-lote (20) y (21) a veces eliminan el término `1/m` que antecede a los sumatorios. Conceptualmente este cambio no produce ninguna diferencia, ya que es equivalente a re-escalar la tasa de aprendizaje. Pero a la hora de comparar diferentes trabajos, merece la pena tenerlo en cuenta.
+
+Podemos imaginar el gradiente descendente estocástico como una encuesta política: es mucho más fácil obtener una mini-lote y luego aplicar ese gradiente a todas las muestras al igual que es mucho más fácil hacer una encuesta que llevar a cabo unas elecciones. For ejemplo, si tenemos una collección de muestras de `n=6000` (como en MNIST) y elegimos un tamaño de lote de (digamos) `m=10` significa que ¡obtenemos una mejora en la velocidad de estimación en un factor de 6000! Por supuesto, esa estimación no será perfecta -habrá fluctuaciones estadísticas- pero no necesita ser perfecta: de lo que nos tenemos que preocupar es movernos en direción que minimice `C` y eso significa que no necesitamos una cálculo exacto del gradiente. En la práctica, el gradiente descendente estocástico es una técnica que se usa comúnmente para que las redes neuronales aprendan y es la base de la mayoría de las técnicas de aprendizaje que vamos a ver en este libro.
+
+### Ejercicio
+
+- Una versión extrema del gradiente descendiente es usar un mini-lote de tamaño 1. Es decir, dado una muestra de entrada `x` actualizaremos nuestros pesos y sesgos de acuerdo a las reglas: `wk→w′k=wk−η∂Cx/∂wk` y `bl→b′l=bl−η∂Cx/∂bl`. Después elegimos otra muestra de entrenamiento y actualizamos los pesos y sesgos de nuevo. Y así sucesivamente. Este procedimiento se conoce como aprendizaje incremental o en-línea. En el aprendizaje incremental, una red neuronal aprende a partir de una sola muestra por vez (como lo hacemos los humanos). Describe una ventaja y una descentaja del aprendizaje incremental comparándolo con el gradiente descendiente estocástico con un tamao de mini-lote de, digamos, 20.
+
+Déjame concluir esta sección discutiendo un punto que a veces despista a los que acaban de conocer el gradiente descendente. En las redes neuronales el coste de `C` depende, por supuesto, de muchas variables (todas ellas pesos y sesgos) y de alguna manera define una superficie en un espacio altamente multi dimensional. Algunas personas se quedan pensado: "Oye, debería poder visualizar esas dimensiones extras", y se empiezan a preocupar: "si no puedo pensar en cuatro dimensiones, imagina en cinco o en cinco millones". ¿Hay alguna habilidad especial que no tengo, alguna habilidad que los verdaderos supermatemáticos tienen? Por supuesto, la respuesta es no. Incluso los más profesionales matemáticos no pueden visualizar cuatro dimensiones especialmente bien, si es que pueden. El truco que usan en vez es encontrar otras maneras de representar lo que está pasando. Eso es exactamente lo que hemos hecho más arriba: hemos utilizado una representación algebraica (en vez de visual) de `ΔC` para ver cómo nos movemos para decrementar `C`. Las personas que son buenas pensando en muchas dimensiones tienen una librería mental con muchas de estas técnicas. Nuestro truco algebraico es sólo un ejemplo. Esas técnicas puede que no tengan la simplicidad a la que estamos acostumbrados cuando visualizamos tres dimensiones, pero una vez te haces con una buena collección de esas ténicas, te vuelves bastante bueno pensando en muchas dimensiones. No voy a entrar en más detalle aquí, pero si estás interesado/a quizás disfrutes leyendo [esta discusión](http://mathoverflow.net/questions/25983/intuitive-crutches-for-higher-dimensional-thinking) sobre las técnicas que usan los matemáticos profesionales para pensar en muchas dimensiones. Aunque algunas de las técnicas que se comentan pueden llegar a ser bastante complejas, muchas de las mejores respuestas son intuitivas y accesibles, y pueden ser ***mastered*** por cualquiera.
+
+## Implementando nuestra red para clasificar dígitos
